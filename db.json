@@ -1,0 +1,243 @@
+{
+  "scrapers": [
+    {
+      "name": "BSP Southpool DA",
+      "fullname": "Core.Scrapers.BSP.BSPSouthPoolDayAhead",
+      "description": "Retrieves Day Ahead Spot Prices from BSP Southpool webpage.",
+      "options": [
+        {
+          "name": "StartDate",
+          "description": "The start of the data capture.",
+          "required": false,
+          "type": "date"
+        },
+        {
+          "name": "EndDate",
+          "description": "The end of the data capture.",
+          "required": false,
+          "type": "date"
+        },
+        {
+          "name": "AutoSetDates",
+          "description": "If set to true, overrides all other date-setting logic with internal custom logic.",
+          "required": true,
+          "type": "boolean",
+          "value": false
+        }
+      ],
+      "produces": [
+        {
+        "name": "DateTime",
+        "type": "column",
+        "valuetype": "DateTime",
+        "description": "The date time of the value. Expected 24 in a normal day."
+        },
+        {
+          "name": "Value",
+          "type": "column",
+          "valuetype": "Decimal",
+          "description": "The price value of the datapoint in €/MW. Expected 24 in a normal day."
+          }
+      ]
+    },
+    {
+      "name": "HUPX DA",
+      "fullname": "Core.Scrapers.HUPX.HUPXDayAhead",
+      "description": "Retrieves Day Ahead Spot Prices from HUPX FTP repository.",
+      "options": [
+        {
+          "name": "DaysToCapture",
+          "description": "How many days the scraper should capture, going from today to previous days.",
+          "required": true,
+          "type": "number",
+          "value": 5
+        },
+        {
+          "name": "Credentials",
+          "description": "The username and PW for the FTP system",
+          "required": true,
+          "type": "string",
+          "value": "username;password",
+          "instructions": "Place the username and password in this line, separated with ;"
+        }
+      ],
+      "produces": [
+        {
+        "name": "DateTime",
+        "type": "column",
+        "valuetype": "DateTime",
+        "description": "The date time of the value. Expected 24 in a normal day."
+        },
+        {
+          "name": "Value",
+          "type": "column",
+          "valuetype": "Decimal",
+          "description": "The price value of the datapoint in €/MW. Expected 24 in a normal day."
+          }
+      ]
+    }
+  ],
+  "validators": [
+    {
+      "name": "Simple Value Validator",
+      "fullname": "Core.Validators.Value.SimpleValueValidator",
+      "description": "Ensures that value falls within range.",
+      "options": [
+        {
+          "name": "Column",
+          "description": "The column used against the other value.",
+          "required": true,
+          "type": "string",
+          "value": "",
+          "instructions": "Column name must match with a column produced by a Scraper module."
+        }
+        ,
+        {
+          "name": "Predicator",
+          "description": "The predicator used against the other value.",
+          "required": true,
+          "type": "selection",
+          "value": "",
+          "selection": ["Equal","GreaterThan","LowerThan"]
+        },
+        {
+          "name": "Value",
+          "description": "The value against which to check.",
+          "required": true,
+          "type": "number",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "name": "Simple Date Validator",
+      "fullname": "Core.Validators.Date.SimpleDateValidator",
+      "description": "Ensures that date falls within range.",
+      "options": [
+        {
+          "name": "Column",
+          "description": "The column used against the other value.",
+          "required": true,
+          "type": "string",
+          "value": "",
+          "instructions": "Column name must match with a column produced by a Scraper module."
+        }
+        ,
+        {
+          "name": "Predicator",
+          "description": "The predicator used against the other value.",
+          "required": true,
+          "type": "selection",
+          "value": "",
+          "selection": ["Equal","GreaterThan","LowerThan"]
+        },
+        {
+          "name": "Date",
+          "description": "The date against which to check.",
+          "required": true,
+          "type": "date",
+          "value": 0
+        }
+      ]
+    }
+  ],
+  "handlers": [
+    {
+      "name": "Text Handler",
+      "fullname": "Core.Handlers.Text.SimpleTextHandler",
+      "description": "Dumps values into a text file.",
+      "options": [
+        {
+          "name": "Location",
+          "description": "Location of the text file.",
+          "required": true,
+          "type": "string",
+          "value": "",
+          "instructions": "Ensure that the system has access to the folder and has write access."
+        }
+      ]
+    },
+    {
+      "name": "SQL Database Handler",
+      "fullname": "Core.Handlers.Database.SQL",
+      "description": "Writes values into SQL database.",
+      "options": [
+        {
+          "name": "ConnectionString",
+          "description": "The SQL Connection string for the handler",
+          "required": true,
+          "type": "string",
+          "value": ""
+        }
+      ]
+    }
+  ],
+  "loggers": [
+    {
+      "name": "Default Logger",
+      "fullname": "Core.Handlers.Loggers.DefaultLogger",
+      "description": "Stores log entries into central log repository",
+      "options": [
+        {
+          "name": "Enabled",
+          "description": "Whether or not logging is enabled for this spider.",
+          "required": true,
+          "type": "boolean",
+          "value": true
+        }
+      ]
+    },
+    {
+      "name": "Text logger",
+      "fullname": "Core.Handlers.Loggers.TextLogger",
+      "description": "Writes log entires into a textfile.",
+      "options": [
+        {
+          "name": "Enabled",
+          "description": "Whether or not logging is enabled for this spider.",
+          "required": true,
+          "type": "boolean",
+          "value": true
+        },
+        {
+          "name": "Location",
+          "description": "The folder where the log will be stored in.",
+          "required": true,
+          "type": "string",
+          "value": ""
+        },
+        {
+          "name": "FilenameMask",
+          "description": "The variable filename mask for the files.",
+          "required": true,
+          "type": "string",
+          "value": "{yyyy-MM-dd-HH-mm-ss_{spiderName}.txt}"
+        }
+      ]
+    }
+  ],
+  "auditers": [
+    {
+      "name": "File System Auditer",
+      "fullname": "Core.Auditers.FileSystemAuditer",
+      "description": "Stores shadow copy of the data on disk.",
+      "options": [
+        {
+          "name": "Enabled",
+          "description": "Whether or not auditing is enabled for this spider.",
+          "required": true,
+          "type": "boolean",
+          "value": true
+        },
+        {
+          "name": "Location",
+          "description": "Location of the audit repository.",
+          "required": true,
+          "type": "string",
+          "value": "",
+          "instructions": "If left blank, system-wide setting will take precedence."
+        }
+      ]
+    }
+  ]
+}
